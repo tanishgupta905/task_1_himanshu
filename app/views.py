@@ -56,7 +56,9 @@ class AssignTaskView(View):
     def get(self, request):
         users = User.objects.exclude(id=request.user.id)
         form = TaskForm()
-        return render(request, "assign_task.html", {'form': form, 'users': users})
+        return render(
+            request, "assign_task.html", {"form": form, "users": users}
+        )
 
     def post(self, request):
         form = TaskForm(request.POST)
@@ -64,9 +66,9 @@ class AssignTaskView(View):
             task = form.save(commit=False)
             task.creator = request.user
             task.save()
-            return redirect('tasklist')
+            return redirect("tasklist")
         else:
-            return render(request, "assign_task.html", {'form': form})
+            return render(request, "assign_task.html", {"form": form})
 
 
 class TaskListView(View):
@@ -74,15 +76,6 @@ class TaskListView(View):
 
     def get(self, request):
         task = Task.objects.all()
-        context = {"task": task}
-        return render(request, self.template_name, context=context)
-
-
-class TaskDetailView(View):
-    template_name = "taskdetail.html"
-
-    def get(self, request, pk):
-        task = Task.objects.filter(id=pk).first()
         context = {"task": task}
         return render(request, self.template_name, context=context)
 
@@ -95,56 +88,42 @@ class TaskUpdateView(View):
         if task:
             users = User.objects.exclude(id=request.user.id)
             form = TaskForm(instance=task)
-            return render(request, self.template_name, {"form": form, "users": users})
-    
+            return render(
+                request, self.template_name, {"form": form, "users": users}
+            )
+
     def post(self, request, pk):
         task = Task.objects.filter(id=pk).first()
         if task:
             form = TaskForm(request.POST, instance=task)
             if form.is_valid():
                 form.save()
-                return redirect('tasklist')
+                return redirect("tasklist")
 
 
-class AddCommentView(View):
-    template_name = "taskdetal.html"
-
+class TaskDetailView(View):
     def get(self, request, pk):
-        task = Task.objects.filter(id=pk).first()
+        task = Task.objects.get(id=pk)
         comments = Comment.objects.filter(task=task)
         form = CommentForm()
-        context = {"task": task, "comments": comments, "form": form}
-        return render(request, self.template_name, context=context)
-    
-    def post(self, request, pk):
-        task = Task.objects.filter(id=pk).first()
-        form = CommentForm(request.POST)
+        return render(
+            request,
+            "taskdetail.html",
+            {"task": task, "comments": comments, "form": form},
+        )
 
+    def post(self, request, pk):
+        task = Task.objects.get(id=pk)
+        form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
-            comment.task = task
             comment.user = request.user
+            comment.task = task
             comment.save()
-            return redirect
-    
-
-
-
-
-
-
-
-#     def post(self, request, pk):
-#         post = Post.objects.filter(id=pk).first()
-#         form = CommentForm(request.POST)
-
-#         if form.is_valid():
-#             comment = form.save(commit=False)
-#             comment.post = post
-#             comment.user = request.user
-#             comment.save()
-#             return redirect("add_comment", pk=pk)
-
-#         comments = Comment.objects.filter(post=post)
-#         context = {"post": post, "comments": comments, "form": form}
-#         return render(request, self.template_name, context)
+            return redirect("detailtask")
+        comments = Comment.objects.filter(task=task)
+        return render(
+            request,
+            "taskdetail.html",
+            {"task": task, "comments": comments, "form": form},
+        )
