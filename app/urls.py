@@ -11,7 +11,7 @@ urlpatterns = [
     path("logout/page/", LogoutView.as_view(), name="logout"),
     path("task/list", TaskListView.as_view(), name='tasklist'),
     path("assign/task", AssignTaskView.as_view(), name='assigntask'),
-    path("detail/task//<int:pk>/", TaskDetailView.as_view(), name='detailtask'),
-    path("update/task//<int:pk>/", TaskUpdateView.as_view(), name='updatetask'),
-
+    path("detail/task/<int:pk>/", TaskDetailView.as_view(), name='detailtask'),
+    path("update/task/<int:pk>/", TaskUpdateView.as_view(), name='updatetask'),
+    path('task/<int:pk>/comments/', TaskDetailView.as_view(), name='add_comments'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
