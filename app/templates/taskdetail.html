@@ -55,7 +55,37 @@
           <p class="card-text">{{ task.due_date }}</p>
         </div>
       </div>
-    
+
+      <!-- Comments Section -->
+      <div class="comments mb-4">
+        <h5>Comments</h5>
+        <div class="list-group">
+          {% for comment in comments %}
+            <div class="list-group-item">
+              <strong>{{ comment.user.first_name }} {{ comment.user.last_name }}</strong>
+              <small class="text-muted">({{ comment.created_at|date:'F j, Y, g:i a' }})</small>
+              <p>{{ comment.comment }}</p>
+            </div>
+          {% empty %}
+            <p class="text-muted">No comments yet. Be the first to comment!</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Add a Comment -->
+      {% if user.is_authenticated %}
+        <form method="POST" class="mt-4">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_comment" class="form-label">Your Comment</label>
+            <textarea name="comment" id="id_comment" class="form-control" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+      {% else %}
+        <p class="text-muted">You must be logged in to add a comment.</p>
+      {% endif %}
+
       <div class="cta mt-4">
         <a href="{% url 'tasklist' %}" class="btn btn-secondary">Back to Task List</a>
       </div>
